@@ -7,24 +7,26 @@
 
 import UIKit
 
-class ChildViewController: UIViewController {
+class ChildViewController: UIViewController, UISearchControllerDelegate, UISearchBarDelegate {
 
     var createButton: UIButton?
     var createButtonBarItem: ExtensionBarItem?
+    var searchBar: UISearchBar?
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
         // Do any additional setup after loading the view.
+        setupSearchController()
         self.navigationItem.title = "Child View"
-        setupNewButton()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        createButtonBarItem?.onViewWillAppear(animated)
         navigationItem.largeTitleDisplayMode = .always
         navigationController?.navigationBar.sizeToFit()
+        self.navigationItem.hidesSearchBarWhenScrolling = false;
+        setupNewButton()
+        createButtonBarItem?.onViewWillAppear(animated)
     }
     
     override func viewDidLayoutSubviews() {
@@ -47,22 +49,40 @@ class ChildViewController: UIViewController {
         super.viewDidDisappear(animated)
     }
 
-    func setupNewButton() {
-        if createButton != nil {
-            return
-        }
+    func setupSearchController() {
+        let lexSearchController = UISearchController()
+        lexSearchController.delegate = self
+        lexSearchController.searchBar.searchBarStyle = .minimal
+        lexSearchController.searchBar.isTranslucent = false
+        lexSearchController.searchBar.delegate = self
+        navigationItem.searchController = lexSearchController
         
-        let createButton = UIButton(type: .system)
-        NSLayoutConstraint.activate([
-                                     createButton.widthAnchor.constraint(equalToConstant: 44.0),
-                                     createButton.heightAnchor.constraint(equalToConstant: 33.0)
-        ])
+        self.searchBar = lexSearchController.searchBar;
+        self.definesPresentationContext = true;
+    }
+    
+    func setupNewButton() {
+//        DispatchQueue.main.async { [self] in
+            if createButton != nil {
+                return
+            }
+            
+            let createButton = UIButton(type: .system)
+            NSLayoutConstraint.activate([
+                                         createButton.widthAnchor.constraint(equalToConstant: 44.0),
+                                         createButton.heightAnchor.constraint(equalToConstant: 33.0)
+            ])
 
-        createButton.setTitle("New", for: .normal)
-        //    self.createButton.titleLabel.font = [UIFont systemFontOfSize:16.0 weight:UIFontWeightSemibold];
-        createButtonBarItem = ExtensionBarItem(itemView: createButton, viewController: self)
-        createButtonBarItem?.onViewWillLayoutSubviews()
-        createButtonBarItem?.onViewWillAppear(true)
-        self.createButton = createButton
+            createButton.setTitle("New", for: .normal)
+            createButton.titleLabel?.font = UIFont.systemFont(ofSize: 16.0, weight: .semibold)
+            createButton.accessibilityHint = "new"
+            createButton.accessibilityLabel = "New object name button"
+            createButton.alpha = 1
+            let createButtonBarItem = ExtensionBarItem(itemView: createButton, viewController: self)
+            self.createButton = createButton
+            self.createButtonBarItem = createButtonBarItem
+            createButtonBarItem.onViewWillLayoutSubviews()
+            createButtonBarItem.onViewWillAppear(true)
+ //       }
     }
 }

@@ -23,6 +23,10 @@ class RootTableViewController: UITableViewController {
         navigationController?.navigationBar.sizeToFit()
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+    }
+    
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return 20
     }
